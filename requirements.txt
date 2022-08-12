@@ -1,2 +1,4 @@
 cherrypy
 jupyter-server-proxy
+pandas
+fastai
