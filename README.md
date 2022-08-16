@@ -46,6 +46,19 @@ For more background info you can check the talk we gave at OpenSource
 Summit NA 2022 [video](https://www.youtube.com/watch?v=IS0k8rPVcmY)
 [slides](OSS%20NA%202022%20presentation.pdf).
 
+## Dependencies
+
+The tool depends on [Pandas](https://pandas.pydata.org),
+[jupyter-server-proxy](https://jupyter-server-proxy.readthedocs.io/en/latest/)
+and [CherryPy](https://cherrypy.dev) and should work with any JupyterLab
+or Jupyter Notebook setup. The demos use [fastai](https://docs.fast.ai)
+for data manipulation and model training.
+
+It does not work on Google Collab because I could not figure out a way
+to expose an HTTP server (needed to serve the images) from the running
+notebook. I think it could be supported in the future by moving the
+images to an object storage database (like Amazon S3).
+
 ### Quick start
 
 It’s easiest to start with any dataset in the ImageNet format (one
