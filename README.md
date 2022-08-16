@@ -28,8 +28,7 @@ labels directly from your Jupyter notebook. You just need a folder full
 of images or an object detection dataset in one of the supported
 formats. Here is an example of MLfix running inside a Jupyter session:
 
-![MLfix v2 usage
-example](https://user-images.githubusercontent.com/107984/184148474-839b8049-fe68-47f0-b4b5-cc83f27dfea8.mp4)
+https://user-images.githubusercontent.com/107984/184148474-839b8049-fe68-47f0-b4b5-cc83f27dfea8.mp4
 
 You can also [try it yourself now on
 Binder](https://mybinder.org/v2/gh/jpc/mlfix-mapillary-traffic-signs/HEAD?labpath=index.ipynb).
