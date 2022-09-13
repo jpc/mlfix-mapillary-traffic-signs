@@ -147,10 +147,13 @@ $(function () {
   var mlfixid = decodeURI(window.location.hash.substr(1));
   var original_data;
 
+  window.onhashchange = () => {
+    window.location.reload();
+  }
+
   model.check_results = () => {
     if(mlfixid === 'results') {
-      var target = new URL('./', window.location);
-      window.location = target;
+      window.location.hash = '';
       return;
     }
 
@@ -177,8 +180,7 @@ $(function () {
     localStorage.setItem('mlfix_score', JSON.stringify(score));
     localStorage.setItem('mlfix_results', JSON.stringify(data));
     console.log('mlfix_score', score);
-    var target = new URL('#results', window.location);
-    window.location = target;
+    window.location.hash = 'results';
   };
 
   // model.last_modified.extend({rateLimit: 200}).subscribe(() => {
