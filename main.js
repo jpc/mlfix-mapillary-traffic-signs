@@ -188,6 +188,24 @@ $(function () {
   // });
   window.model = model;
 
+  function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+
+    // While there remain elements to shuffle.
+    while (currentIndex != 0) {
+
+      // Pick a remaining element.
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+  }
+
   var load_json = (result) => {
     data = JSON5.parse(result);
     original_data = data;
@@ -201,7 +219,7 @@ $(function () {
     if (data.groups) {
       var baseurl = new URL('imgs/', window.location);
       data.groups.forEach(cl => { cl.photos.forEach(x => { x.kind = 'photo'; x.label = ko.observable(x.label); x.url = new URL(x.fname, baseurl).toString(); })});
-      data = _.flatten(_.map(data.groups, x => [{ kind: 'separator', text: x.name }].concat(x.photos)));
+      data = _.flatten(_.map(data.groups, x => [{ kind: 'separator', text: x.name }].concat(shuffle(x.photos))));
     }
     update_photos(data);
   }
