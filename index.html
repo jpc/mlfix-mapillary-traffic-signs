@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="./vendor/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="./vendor/fontawesome-free-6.2.0-web/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="./vendor/lozad.min.js"></script>
+  <link href="../mlfix-game-styles.css" rel="stylesheet">
+  <style>
+    #photos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .photo-caption {
+      text-align: center;
+    }
+    .photo-label {
+      border-radius: 5px;
+      width: 5em;
+      margin: 5px auto;
+      text-align: center;
+    }
+    .photo {
+      margin: 10px 0;
+      display: inline-block;
+    }
+    .photo.marked {
+      outline: 2px solid red;
+    }
+    .filter-only-marked .marked img {
+      opacity: 1;
+    }
+    .marked {
+      background: #faa;
+    }
+    .marked img {
+      opacity: 0.4;
+    }
+    #drop-mask {
+      position:  fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: #eeeb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .drop-tooltip {
+      background: #fff;
+      font-size: 2em;
+      padding: 30px;
+      border-radius: 15px;
+      pointer-events: none;
+    }
+    .drop-icon {
+      font-size: 5em;
+      display: block;
+      text-align: center;
+      padding: 15px;
+      color: #5334bc;
+    }
+    #no-photos {
+      text-align: center;
+    }
+    h2 {
+      width: 100%;
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0px;
+      padding: 9px;
+      background: white;
+      z-index: 1;
+    }
+    h2 img {
+      vertical-align: baseline;
+      height: 25px;
+    }
+  </style>
+  <style data-bind="text: dynamic_styles()"></style>
+  <script src="./vendor/knockout-latest.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./vendor/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./vendor/lodash.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./vendor/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="./vendor/localforage.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./vendor/json5.index.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" charset="UTF-8" src="main.js"></script>
+</head>
+<script src="../hotkeys.js"></script>
+<body class="mlfix-mlfix"><div class="container-fluid">
+  <nav class="navbar navbar-expand-md navbar-dark" style="background: #5334BC;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="https://github.com/collabora/MLfix">
+        <img src="logo.svg" alt="" width="62" style="margin-bottom: 3px; margin-right: 3px" class="d-inline-block">
+        MLfix Image v2.0
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle mx-3" id="markedDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bind="text: 'Marked: '+marked_count()+'/'+photos_count()"></a>
+            <ul class="dropdown-menu" aria-labelledby="markedDropdown">
+              <li><a class="dropdown-item" data-bind="css: { active: model.filter() == $data }, click: model.clear_all_marked">
+                <span>Clear all markings</span>
+              </a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-exclamation-triangle" style="color: #e51;" data-bind="visible: filter() != 'all' && filtered_photos().length == 0"></i> <span data-bind="text: 'Show '+model.filter()"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown" data-bind="foreach: ['all', 'only valid', 'only invalid']">
+              <li><a class="dropdown-item" data-bind="css: { active: model.filter() == $data }, click: function () { model.filter($data) }">
+                <span data-bind="text: 'Show '+$data"></span>
+              </a></li>
+            </ul>
+          </li>
+<!--           <li class="nav-item ms-3" data-bind="click: revert_changes, visible: model.last_modified()">
+            <a class="nav-link"><i class="far fa-trash-alt"></i> Revert</a>
+          </li> -->
+          <li class="nav-item ms-3" data-bind="click: check_results">
+            <button id="next-btn" class="btn btn-primary my-2 my-sm-0">Check results</button>
+            <!-- <a class="nav-link"><i class="far fa-maximize"></i></a> -->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="d-flex justify-content-center text-warning my-4" data-bind="if: !model.error() && model.photos().length == 0">
+    <div class="spinner-border text-warning" role="status"></div><h3 class="ms-3">Loading...</h3>
+  </div>
+  <div class="d-flex justify-content-center text-error my-4" data-bind="if: model.error()">
+    <h3 class="ms-3"><i class="fa-solid fa-triangle-exclamation"></i> <span data-bind="text: model.error"></span></h3>
+  </div>
+  <div id="no-photos" data-bind="if: filtered_photos().length == 0">
+    There are no photos. Please check your filter setting or select a diferent source.
+  </div>
+  <div id="photos" data-bind="foreach: filtered_photos, css: 'filter-'+model.filter().replace(' ', '-'), childrenComplete: activate_lazy_load">
+    <!-- ko component: {
+      name: kind,
+      params: $data
+    } -->
+    <!-- /ko -->
+  </div>
+</div></body>
+</html>
